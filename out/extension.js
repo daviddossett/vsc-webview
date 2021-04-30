@@ -2,8 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 const vscode = require("vscode");
-const path = require("path");
-function getWebViewContent(cat) {
+function getWebViewContent() {
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -13,20 +12,26 @@ function getWebViewContent(cat) {
           <title>Cat Coding</title>
       </head>
       <body>
-          <img src="${cat}" width="300" />
+          <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" width="300" />
+          <h1 id="lines-of-code-counter">0</h1>
+
+      <script>
+          const counter = document.getElementById('lines-of-code-counter');
+
+          let count = 0;
+          setInterval(() => {
+              counter.textContent = count++;
+          }, 100);
+      </script>
       </body>
     </html>`;
 }
 function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('catCoding.start', () => {
         const panel = vscode.window.createWebviewPanel('catCoding', 'Cat Coding', vscode.ViewColumn.One, {
-            localResourceRoots: [
-                vscode.Uri.file(path.join(context.extensionPath, 'media')),
-            ],
+            enableScripts: true,
         });
-        const diskPath = vscode.Uri.file(path.join(context.extensionPath, 'src/media', 'cat.gif'));
-        const catGifSrc = panel.webview.asWebviewUri(diskPath);
-        panel.webview.html = getWebViewContent(catGifSrc);
+        panel.webview.html = getWebViewContent();
     }));
 }
 exports.activate = activate;
