@@ -19,7 +19,11 @@ function getWebViewContent(cat) {
 }
 function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('catCoding.start', () => {
-        const panel = vscode.window.createWebviewPanel('catCoding', 'Cat Coding', vscode.ViewColumn.One, {});
+        const panel = vscode.window.createWebviewPanel('catCoding', 'Cat Coding', vscode.ViewColumn.One, {
+            localResourceRoots: [
+                vscode.Uri.file(path.join(context.extensionPath, 'media')),
+            ],
+        });
         const diskPath = vscode.Uri.file(path.join(context.extensionPath, 'src/media', 'cat.gif'));
         const catGifSrc = panel.webview.asWebviewUri(diskPath);
         panel.webview.html = getWebViewContent(catGifSrc);

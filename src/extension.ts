@@ -23,7 +23,11 @@ export function activate(context: vscode.ExtensionContext) {
         'catCoding',
         'Cat Coding',
         vscode.ViewColumn.One,
-        {}
+        {
+          localResourceRoots: [
+            vscode.Uri.file(path.join(context.extensionPath, 'media')),
+          ],
+        }
       );
 
       const diskPath = vscode.Uri.file(
