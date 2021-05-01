@@ -11,7 +11,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:catCoding.start"
+    "onCommand:catCoding.start",
+    "onCommand:catCoding.refactor"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -19,6 +20,11 @@
       {
         "command": "catCoding.start",
         "title": "Start new cat coding session",
+        "category": "Cat Coding"
+      },
+      {
+        "command": "catCoding.refactor",
+        "title": "Refactor the code",
         "category": "Cat Coding"
       }
     ]

@@ -16,22 +16,48 @@ function getWebViewContent() {
           <h1 id="lines-of-code-counter">0</h1>
 
       <script>
-          const counter = document.getElementById('lines-of-code-counter');
+        const counter = document.getElementById('lines-of-code-counter');
 
-          let count = 0;
-          setInterval(() => {
-              counter.textContent = count++;
-          }, 100);
+        let count = 0;
+        setInterval(() => {
+            counter.textContent = count++;
+        }, 100);
+
+        window.addEventListener('message', () => {
+          const message = event.data;
+
+          switch(message.command) {
+            case 'refactor':
+              count = Math.ceil(count * 0.2);
+              counter.textContent = count;
+              break;
+          }
+        });
       </script>
       </body>
     </html>`;
 }
 function activate(context) {
+    let currentPanel = undefined;
     context.subscriptions.push(vscode.commands.registerCommand('catCoding.start', () => {
-        const panel = vscode.window.createWebviewPanel('catCoding', 'Cat Coding', vscode.ViewColumn.One, {
-            enableScripts: true,
-        });
-        panel.webview.html = getWebViewContent();
+        if (currentPanel) {
+            currentPanel.reveal(vscode.ViewColumn.One);
+        }
+        else {
+            currentPanel = vscode.window.createWebviewPanel('catCoding', 'Cat Coding', vscode.ViewColumn.One, {
+                enableScripts: true,
+            });
+        }
+        currentPanel.webview.html = getWebViewContent();
+        currentPanel.onDidDispose(() => {
+            currentPanel = undefined;
+        }, undefined, context.subscriptions);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand('catCoding.refactor', () => {
+        if (!currentPanel) {
+            return;
+        }
+        currentPanel.webview.postMessage({ command: 'refactor' });
     }));
 }
 exports.activate = activate;
