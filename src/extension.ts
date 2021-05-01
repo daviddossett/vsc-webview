@@ -15,23 +15,20 @@ function getWebViewContent() {
           <h1 id="lines-of-code-counter">0</h1>
 
       <script>
+        const vscode = acquireVsCodeApi();
+
         const counter = document.getElementById('lines-of-code-counter');
-
-        let count = 0;
+        
+        // Check if we have an old state to restore from
+        const previousState = vscode.getState();
+        let count = previousState ? previousState.count : 0;
+        counter.textContent = count;
+        
         setInterval(() => {
-            counter.textContent = count++;
+          counter.textContent = count++;
+          // Update the saved state
+          vscode.setState({ count });
         }, 100);
-
-        window.addEventListener('message', () => {
-          const message = event.data;
-
-          switch(message.command) {
-            case 'refactor':
-              count = Math.ceil(count * 0.2);
-              counter.textContent = count;
-              break;
-          }
-        });
       </script>
       </body>
     </html>`;
@@ -55,9 +52,14 @@ export function activate(context: vscode.ExtensionContext) {
         );
       }
       currentPanel.webview.html = getWebViewContent();
-      currentPanel.onDidDispose(
-        () => {
-          currentPanel = undefined;
+
+      currentPanel.webview.onDidReceiveMessage(
+        (message) => {
+          switch (message.command) {
+            case 'alert':
+              vscode.window.showErrorMessage(message.text);
+              return;
+          }
         },
         undefined,
         context.subscriptions
